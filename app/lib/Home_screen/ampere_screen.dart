@@ -1,16 +1,14 @@
-import 'package:app/Home_screen/pressure.dart';
+import 'package:app/Home_screen/ampere_screen.dart';
 import 'package:flutter/material.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+class AmpereScreen extends StatefulWidget {
+  const AmpereScreen({super.key});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<AmpereScreen> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
-  bool isCompressorOn = false; // Initial status of the compressor
-
+class _DashboardState extends State<AmpereScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,31 +28,7 @@ class _DashboardState extends State<Dashboard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              // Glass effect container
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isCompressorOn = !isCompressorOn;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white54.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Compressor Status: ${isCompressorOn ? 'ON' : 'OFF'}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isCompressorOn ? Colors.green : Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Center(),
               const SizedBox(height: 20),
 
               // New container with Icon and Text
@@ -70,13 +44,13 @@ class _DashboardState extends State<Dashboard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.thermostat,
+                        Icons.electric_bolt,
                         size: 30,
                         color: Colors.red,
                       ),
                       SizedBox(width: 10),
                       Text(
-                        'Temperature',
+                        'Ampere',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -93,16 +67,16 @@ class _DashboardState extends State<Dashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildInfoCard(
-                    icon: Icons.thermostat,
+                    icon: Icons.electric_bolt,
                     color: Colors.blue,
                     title: 'Chilled water in',
-                    subtitle: 'Temperature: 25',
+                    subtitle: 'Temperature: 25\nHigh\nLow',
                   ),
                   _buildInfoCard(
-                    icon: Icons.thermostat,
+                    icon: Icons.electric_bolt,
                     color: Colors.orange,
                     title: 'Chilled water out',
-                    subtitle: 'Temperature: 25',
+                    subtitle: 'Temperature: 25\nHigh\nLow',
                   ),
                 ],
               ),
@@ -112,60 +86,16 @@ class _DashboardState extends State<Dashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildInfoCard(
-                    icon: Icons.thermostat,
+                    icon: Icons.electric_bolt,
                     color: Colors.green,
                     title: 'Suction temp',
-                    subtitle: 'Temperature: 25\nHigh\nLow',
-                  ),
-                  _buildInfoCard(
-                    icon: Icons.thermostat,
-                    color: Colors.purple,
-                    title: 'Discharge temp',
                     subtitle: 'Temperature: 25\nHigh\nLow',
                   ),
                 ],
               ),
               const SizedBox(height: 30),
 
-              // Pressure container with navigation
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PressureScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.air,
-                          size: 30,
-                          color: Colors.blue,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Pressure',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              // Pressure container with navigation to AmpereScreen
             ],
           ),
         ),
@@ -206,5 +136,3 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
-
-// New screen for Pressure
