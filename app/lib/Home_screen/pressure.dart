@@ -9,9 +9,19 @@ class PressureScreen extends StatefulWidget {
 }
 
 class _DashboardState extends State<PressureScreen> {
+  int _currentIndex = 0;
+
+  // Map to store high and low values for each title
+  final Map<String, Map<String, String>> _containerValues = {
+    'Chilled water in': {'High': '25', 'Low': '15'},
+    'Chilled water out': {'High': '26', 'Low': '16'},
+    'Suction temp': {'High': '27', 'Low': '17'},
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // Avoid the keyboard resizing the screen
       backgroundColor: Colors.transparent,
       body: Container(
         decoration: const BoxDecoration(
@@ -28,10 +38,10 @@ class _DashboardState extends State<PressureScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              Center(),
+              const Center(),
               const SizedBox(height: 20),
 
-              // New container with Icon and Text
+              // Title container
               Center(
                 child: Container(
                   padding:
@@ -62,7 +72,7 @@ class _DashboardState extends State<PressureScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Containers with icons, text, and subtitles on left and right
+              // Info cards
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -70,13 +80,11 @@ class _DashboardState extends State<PressureScreen> {
                     icon: Icons.air,
                     color: Colors.blue,
                     title: 'Chilled water in',
-                    subtitle: 'Temperature: 25\nHigh\nLow',
                   ),
                   _buildInfoCard(
                     icon: Icons.air,
                     color: Colors.orange,
                     title: 'Chilled water out',
-                    subtitle: 'Temperature: 25\nHigh\nLow',
                   ),
                 ],
               ),
@@ -89,13 +97,12 @@ class _DashboardState extends State<PressureScreen> {
                     icon: Icons.air,
                     color: Colors.green,
                     title: 'Suction temp',
-                    subtitle: 'Temperature: 25\nHigh\nLow',
                   ),
                 ],
               ),
               const SizedBox(height: 30),
 
-              // Pressure container with navigation to AmpereScreen
+              // Navigation to AmpereScreen
               Center(
                 child: GestureDetector(
                   onTap: () {
@@ -138,39 +145,125 @@ class _DashboardState extends State<PressureScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
     );
   }
 
-  // Reusable info card widget
+  // Reusable info card widget with dialog functionality
   Widget _buildInfoCard({
     required IconData icon,
     required Color color,
     required String title,
-    required String subtitle,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      width: MediaQuery.of(context).size.width * 0.4,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: color),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+    final high = _containerValues[title]?['High'] ?? 'N/A';
+    final low = _containerValues[title]?['Low'] ?? 'N/A';
+
+    return GestureDetector(
+      onTap: () {
+        _showDialog(title);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        width: MediaQuery.of(context).size.width * 0.4,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: color),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 5),
-          Text(subtitle, textAlign: TextAlign.center),
-        ],
+            const SizedBox(height: 10),
+            Text(
+              'High: $high\nLow: $low',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  // Show dialog for high and low input
+  void _showDialog(String title) {
+    final TextEditingController highController =
+        TextEditingController(text: _containerValues[title]?['High']);
+    final TextEditingController lowController =
+        TextEditingController(text: _containerValues[title]?['Low']);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Set Levels for $title'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: highController,
+                decoration: const InputDecoration(labelText: 'High Level'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: lowController,
+                decoration: const InputDecoration(labelText: 'Low Level'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _containerValues[title] = {
+                    'High': highController.text,
+                    'Low': lowController.text,
+                  };
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
